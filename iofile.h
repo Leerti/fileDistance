@@ -25,8 +25,10 @@ void stringToFile(char *fileOutput, char *string);
  */
 char *fileToString(char *fileInput);
 
-void generateModFile(Stack *stack, char *fileOutput);
+void writeModFile(Stack *stack, char *fileOutput);
 
 void modifyFile(char *fileInput, char *fileModify, char *fileOutput);
+
+Stack *readModFile(char *fModify);
 
 #endif /* iofile_h */

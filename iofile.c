@@ -28,9 +28,14 @@ char *set(char *string, unsigned int pos, char character) {
 Function to execute a DEL in the string: "string" in the position: "pos"
  */
 char *del(char *string, unsigned int pos) {
-    pos = pos ;
-    char *temp = NULL;
-    temp = memmove(&string[pos], &string[pos + 1], strlen(string) - pos);
+    pos--;
+    while(pos<strlen(string)-1){
+        string[pos]=string[pos+1];
+        pos++;
+       
+    }
+    string[pos]='\0';
+    
     return string;
 }
 
@@ -94,27 +99,24 @@ void stringToFile(char *fileOutput, char *string) {
 }
 
 
-void writeModFIle(Stack *stack, FILE *modFile) {
-    char* command=NULL;
-    while(!checkEmptyStack(stack)){
-        command=getType(stack);
-        for (int i=0;i<3;i++){
-            fwrite(&command[i], sizeof(char),1 , modFile);
-        }
-        fwrite(&stack->pos, sizeof(unsigned int), 1, modFile);
-        fwrite(&stack->character, sizeof(char), 1, modFile);
-        popNode(&stack);
-    }
-
-}
-
-void generateModFile(Stack *command, char *fileOutput) {
+void writeModFile(Stack *stack, char *fileOutput) {
         FILE *filebin;
-        if ((filebin = fopen(fileOutput, "wb+")) == NULL) {
+        if ((filebin = fopen(fileOutput, "wr+")) == NULL) {
             perror("Could not open file");
             exit(1);
         }else{
-            writeModFIle(command, filebin);
+            char* command=NULL;
+            while(!checkEmptyStack(stack)){
+                command=getType(stack);
+                for (int i=0;i<3;i++){
+                    fwrite(&command[i], 1 ,sizeof(char),filebin);
+                }
+                fwrite(&stack->pos,1,sizeof(unsigned int),filebin);
+                if(strcmp("DEL",command)!=0)
+                fwrite(&stack->character,1,sizeof(char),filebin);
+                popNode(&stack);
+            }
+            popNode(&stack);
             fclose(filebin);
         }
 }
@@ -130,33 +132,28 @@ void pushOperationInStack(Stack **root, char command, unsigned int position, cha
     }
 }
 
-void scrollModFile(FILE *fileBin, Stack **root) {
-    char command;
-    unsigned int position = 0;
-    char character = '\0';
-    while (!feof(fileBin)) {
-        fread(&command, sizeof(char), 1, fileBin);
-        fseek(fileBin, 2, SEEK_CUR);
-        fread(&position, (sizeof(unsigned int)), 1, fileBin);
-        if (command != 'D')
-            fread(&character, (sizeof(char)), 1, fileBin);
-        pushOperationInStack(root, command, position, character);
-        character = '\0';
-    }
-}
 /*
 Function to read a stack of instructions from a .bin file
  */
 Stack *readModFile(char *fModify) {
-    FILE *fileBin = fopen(fModify, "rb+");
+    FILE *fileBin = fopen(fModify, "rb");
     if (fileBin == NULL) {
         perror("Could not open file");
         exit(1);
     }
-
     Stack *root = NULL;
-    scrollModFile(fileBin, &root);
-
+    char command;
+    unsigned int position;
+    char character ='\0';
+    while (!feof(fileBin)) {
+        fread(&command, sizeof(char), 1, fileBin);
+        fseek(fileBin, 2, SEEK_CUR);
+        fread(&position, (sizeof( unsigned int)), 1, fileBin);
+        if(command!='D')
+        fread(&character, (sizeof(char)), 1, fileBin);
+        pushOperationInStack(&root, command, position, character);
+        character='\0';
+    }
     fclose(fileBin);
     return root;
     

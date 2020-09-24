@@ -42,8 +42,7 @@ int calculateElement(int aboveEl, int leftEl, int diagonalEl, char firstStringCh
 int **initMatrix(int **matrix, char *firstString, int x, char *secondString, int y) {
     for (int i = 1; i < x; i++) {
         for (int j = 1; j < y; j++) {
-            matrix[i][j] = calculateElement(matrix[i - 1][j], matrix[i][j - 1],
-                                            matrix[i - 1][j - 1], firstString[i-1], secondString[j-1]);
+            matrix[i][j] = calculateElement(matrix[i - 1][j], matrix[i][j - 1], matrix[i - 1][j - 1], firstString[i-1], secondString[j-1]);
         }
     }
     return matrix;

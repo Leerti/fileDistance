@@ -10,10 +10,11 @@
 #include "distance.h"
 
 int main() {
+    getDistance("/Users/ale/Desktop/fileIn1.txt","/Users/ale/Desktop/filein2.txt");
     
-    getCommand("/Users/ale/Desktop/fileIn.rtf", "/Users/ale/Desktop/filemodd.rtf", "/Users/ale/Library/Mobile Documents/com~apple~TextEdit/Documents/fileout.txt");
+    getCommand("/Users/ale/Desktop/fileIn1.txt","/Users/ale/Desktop/filein2.txt" ,"/Users/ale/Desktop/fileModt.bin");
+    applyMod("/Users/ale/Desktop/filein2.txt", "/Users/ale/Desktop/fileModt.bin", "/Users/ale/Desktop/fileOut.txt");
     
-    applyMod("/Users/ale/Desktop/filemodd.rtf", "/Users/ale/Desktop/filemodd.rtf", "/Users/ale/Desktop/fileIn.rtf");
     return 0;
     
 }

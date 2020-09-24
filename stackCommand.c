@@ -12,41 +12,41 @@
 #include <string.h>
 
 
-
 int checkEmptyStack(Stack *root) {
     return !root;
 }
 Stack *createNewNode() {
     Stack *newNode = (Stack *) malloc(sizeof(Stack));
-    newNode->pos = (unsigned int ) calloc(1,sizeof(unsigned int));
-    newNode->character = (char ) calloc(1,sizeof(char));
-    newNode->type = (type_op ) calloc(1,sizeof(type_op));
+    newNode->pos = 0;
+    newNode->character = ' ';
+    newNode->type = 0;
     newNode->prev = NULL;
     return newNode;
 }
 
 void pushNode(Stack **root, unsigned int pos, char character, type_op type) {
     Stack *nextNode = createNewNode();
+    nextNode->pos = pos;
     nextNode->character = character;
     nextNode->type = type;
-    nextNode->pos = pos;
     nextNode->prev=*root;
 
     *root = nextNode;
-
 }
 
 void popNode(Stack**root){
     Stack * temp= *root;
     if(!checkEmptyStack(*root)){
         *root = (*root)->prev;
+        
         free(temp);
+    }else {
+        free(*root);
     }
-
 }
 
 char *getType(Stack *node){
-    if(checkEmptyStack(node)){
+    if(!checkEmptyStack(node)){
         switch (node->type) {
             case SET:
                 return "SET";

@@ -30,7 +30,7 @@ void getCommand(char *firstFile, char *secondFile, char *fOutput){
     start_time();
     char *firstString = fileToString(firstFile);
     char *secondString = fileToString(secondFile);
-    generateModFile(getOperations(firstString,secondString), fOutput);
+    writeModFile(getOperations(firstString,secondString), fOutput);
     free(firstString);
     free(secondString);
     printf("TIME: %lf\n", end_time());

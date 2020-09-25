@@ -10,30 +10,33 @@
 
 #include <stdio.h>
 
-typedef struct StackFile{
+typedef struct queue_file{
     char *path;
     int distance;
-    struct StackFile *next;
-}StackFile;
+    struct queue_file *next;
+    }queueFile;
 
-StackFile *newQueueList(void);
-
-/*
-Function to check if the stack is empty
-*/
-int checkEmptyFileStack(StackFile *root);
 
 /*
-Function to add an item to the priority stack: "root".
-(priority is determined by distance)
+Funzione per controllare se la coda sia vuota.
+ La funzione restituisce 0 finche ci sono elementi all'interno
 */
-void enqueueFile(StackFile **root, char *path, unsigned int distance);
+int checkEmptyQueue(queueFile *root);
+
 
 /*
-Function toremove a lower priority item
-(from the start) from the stack: "root".
+Funzione per aggiungere un elemento alla coda con priorità.
+Essendo una coda con priorità, l'elemento aggiunto non viene aggiunto in testa ma in una determinata posizione.
+ La sua priorità nella coda è determinata dalla distanza.
+ Più la distanza è piccola, più sarà 'in alto' nella coda
 */
-void dequeueFile(StackFile **root);
+void enqueueFile(queueFile **root, char *path, unsigned int distance);
+
+
+/*
+Questa funzione rimuove il nodo della coda con maggiore priorità: cioè il nodo che sta più 'in alto '.
+*/
+void dequeueFile(queueFile **root);
 
 
 #endif /* stackDirectory_h */

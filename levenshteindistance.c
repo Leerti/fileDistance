@@ -137,7 +137,7 @@ type_op defineOperation(int**matrix, int x, int y) {
  *Nel caso in cui l'operazione da eseguire sia una SET, si controlla se i caratteri delle due stringhe rispettivamente nelle
  * posizione x-1 e y-1 sono diversi: solo in questo caso si esegue la SET, altrimenti non si esegue nulla.
  */
-void pushOperation(type_op type, Stack **root, char *firstString, char *secondString, int *x, int *y) {
+void pushOperation(type_op type, stackCommand **root, char *firstString, char *secondString, int *x, int *y) {
     if (type == SET) {
         if (firstString[*x - 1] != secondString[*y - 1]) {
             pushCommand(root, *y, firstString[*x - 1], SET);
@@ -183,11 +183,11 @@ int calculateLevenshtein(char *firstString, char *secondString) {
 }
 
 
-Stack *getOperations(char *firstString, char *secondString) {
+stackCommand *getOperations(char *firstString, char *secondString) {
     int **matrix = createMatrix(firstString, secondString);
     int x = (int) strlen(firstString);
     int y = (int) strlen(secondString);
-    Stack *stack = NULL;
+    stackCommand *stack = NULL;
     int currentPos = matrix[x][y];
     while (currentPos != 0) {
         pushOperation(defineOperation(matrix, x, y), &stack, firstString, secondString, &x, &y);
@@ -199,20 +199,18 @@ Stack *getOperations(char *firstString, char *secondString) {
 
 
 /*
-Function that pays a deep visit to the directory: "pBase"
-and populates the "root" queue with the edit distance
-between the files in the directory and the "fInput" file.
- */
-void depthSearch(char *fInput, char *pBase, StackFile **root){
+ Funzione per eseguire una visita in profondita partendo dalla direcotry base.
+ Per ogni file incontrato si esegue un ENQUEUEFILE e il file viene aggiunto nella giusta posizione nella coda root.
+*/
+void depthSearch(char *fInput, char *base, queueFile **root){
     struct dirent *dp;
-    DIR *directory = opendir(pBase);
-    
+    DIR *directory = opendir(base);
     if(!directory)
         return;
     while((dp = readdir(directory)) != NULL){
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0 && strcmp(dp->d_name, ".DS_Store")){
-            char *path = (char*)malloc((strlen(pBase)+strlen(dp->d_name)+1)*sizeof(char));
-            strcpy(path, pBase);
+            char *path = (char*)malloc((strlen(base)+strlen(dp->d_name)+1)*sizeof(char));
+            strcpy(path, base);
             strcat(path, "/");
             strcat(path, dp->d_name);
             if(dp->d_type != DT_DIR)
@@ -225,26 +223,26 @@ void depthSearch(char *fInput, char *pBase, StackFile **root){
 }
 
 /*
-function to print the queue of edit distances based
-on the unsigned int limit: "distanceLimit"
+Funzione per stampare a video una seuqenza di path di file con relativa distanza di edit.
+ Gli unici file che vengono stampati sono quelli con distanza di edit minore di limit.
  */
 
-void printQueuePath(StackFile **root, unsigned int distanceLimit){
-    if(checkEmptyFileStack(*root))
+void printQueuePath(queueFile **root, unsigned int distanceLimit){
+    if(checkEmptyQueue(*root))
         return;
-    StackFile *node = *root;
+    queueFile *node = *root;
     if(distanceLimit==0)
         distanceLimit = (*root)->distance;
-    while (!checkEmptyFileStack(*root) && (node = *root)->distance <= distanceLimit) {
+    while (!checkEmptyQueue(*root) && (node = *root)->distance <= distanceLimit) {
         char *path = realpath(node->path, NULL);
         printf("%i\t\t%s\n", node->distance, path);
         dequeueFile(root);
     }
 }
 
-void recursiveLevensthein(char *fInput, char *path, unsigned int distanceLimit){
-    StackFile *root = NULL;
-    depthSearch(fInput, path, &root);
+void recursiveLevensthein(char *fileInput, char *path, unsigned int distanceLimit){
+    queueFile *root = NULL;
+    depthSearch(fileInput, path, &root);
     printQueuePath(&root, distanceLimit);
     
 }

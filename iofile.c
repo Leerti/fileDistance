@@ -15,8 +15,8 @@
 
 
 /*
- *Funzione per eseguire l'operazione SET nella posizione 'pos' del carattere 'character'.
- *Viene settato il carattere presente nella posizione 'pos' come 'character'
+ Funzione per eseguire l'operazione SET nella posizione 'pos' del carattere 'character'.
+ Viene settato il carattere presente nella posizione 'pos' come 'character'
  */
 char *set(char *string, unsigned int position, char character) {
     position--;
@@ -26,9 +26,9 @@ char *set(char *string, unsigned int position, char character) {
 
 
 /*
- *Funzione per eseguire l'operazione DEL nella posiozne 'pos'.
- *Dalla posizione pos alla fine dela stringa vengono spostati tutti i caratteri indietro di una posizione.
- *L'ultimo carattere presente viene sovrascritto con '\0' (carattere di terminazione della stringa).
+ Funzione per eseguire l'operazione DEL nella posiozne 'pos'.
+ Dalla posizione pos alla fine dela stringa vengono spostati tutti i caratteri indietro di una posizione.
+ L'ultimo carattere presente viene sovrascritto con '\0' (carattere di terminazione della stringa).
  */
 char *del(char *string, unsigned int position) {
     position--;
@@ -43,11 +43,9 @@ char *del(char *string, unsigned int position) {
 
 
 /*
- *Funzione per eseguire l'operazione ADD del carattere 'character' nella posizione 'pos'.
- *Vengono copiati tutti i caratteri dall'inizio della stringa fino alla poszione 'pos'-1 in un'altra stringa[temp],
- * viene aggiunto il carattere 'character' e tutti gli altri caratteri (dalla posizione 'pos' alla fine della stringa) vengono
- * riscritti dopo.
- *La funzione ritorna il puntatore a caratteri che contiene la nuova stringa con il carattere aggiunto.
+ Funzione per eseguire l'operazione ADD del carattere 'character' nella posizione 'pos'.
+ Vengono copiati tutti i caratteri dall'inizio della stringa fino alla poszione 'pos'-1 in un'altra stringa[temp], viene aggiunto il carattere 'character' e tutti gli altri caratteri (dalla posizione 'pos' alla fine della stringa) vengono riscritti dopo.
+ La funzione ritorna il puntatore a caratteri che contiene la nuova stringa con il carattere aggiunto.
  */
 char *add(char *string, unsigned int position, char character) {
     int i;
@@ -77,12 +75,10 @@ char *add(char *string, unsigned int position, char character) {
 
 
 /*
- *Questa funzione prende in input un puntatore a puntatore ad uno stack, un carattere 'command' che indica il comando da
- * eseguire (A,per ADD-S,per SET-D, per DEL), un intero senza segno che indica la posizione dove la modifica deve essere
- * fatta, 'pos', e il carattere da modificare 'character'.
- *La funzione richiama il metodo PUSHNODE per creare ed inserire un nuovo nodo all'interno dello Stack che ha come radice root.
+ Questa funzione prende in input un puntatore a puntatore ad uno stack, un carattere 'command' che indica il comando da eseguire (A,per ADD-S,per SET-D, per DEL), un intero senza segno che indica la posizione dove la modifica deve essere fatta, 'pos', e il carattere da modificare 'character'.
+ La funzione richiama il metodo PUSHNODE per creare ed inserire un nuovo nodo all'interno dello Stack che ha come radice root.
  */
-void pushOperationInStack(Stack **root, char command, unsigned int position, char character) {
+void pushOperationInStack(stackCommand **root, char command, unsigned int position, char character) {
     if(command=='S'){
             pushCommand(root,  position, character,SET);
     }else if(command=='A'){
@@ -94,21 +90,19 @@ void pushOperationInStack(Stack **root, char command, unsigned int position, cha
 
 
 /*
- *Questa funzione prende in input il path del file in cui sono scritte le operazioni di modifica nella forma:
- *ADD​nb​: n è un intero senza segno (unsigned int) rappresentato con 4 byte (byte più significativo all’inizio)
- * mentre ​b è un singolo byte. Tale operazione indica che viene aggiunto il byte ​b n​ ella posizione ​n​.
- *DEL​n:​ n è un intero senza segno (unsigned int). Tale operazione indica che viene eliminato il byte​ n​ ella posizione ​n.
- *SET​nb​: n è un intero senza segno (unsigned int) rappresentato con 4 byte mentre ​b è un singolo byte. Tale operazione indica
- * che valore del byte in posizione ​n ​viene impostato a ​b.
- *La funzione legge le operazioni dal file e le aggiunge attraverso la funzione PUSHOPERATIONINSTACK allo Stack.
+ Questa funzione prende in input il path del file in cui sono scritte le operazioni di modifica nella forma:
+ ADD​nb​: n è un intero senza segno (unsigned int) rappresentato con 4 byte (byte più significativo all’inizio) mentre ​b è un singolo byte. Tale operazione indica che viene aggiunto il byte ​b n​ ella posizione ​n​.
+ DEL​n:​ n è un intero senza segno (unsigned int). Tale operazione indica che viene eliminato il byte​ n​ ella posizione ​n.
+ SET​nb​: n è un intero senza segno (unsigned int) rappresentato con 4 byte mentre ​b è un singolo byte. Tale operazione indica che valore del byte in posizione ​n ​viene impostato a ​b.
+ La funzione legge le operazioni dal file e le aggiunge attraverso la funzione PUSHOPERATIONINSTACK allo Stack.
  */
-Stack *readModFile(char *fileModify) {
+stackCommand *readModFile(char *fileModify) {
     FILE *fileBin = fopen(fileModify, "rb");
     if (fileBin == NULL) {
         perror("Could not open file");
         exit(1);
     }
-    Stack *root = NULL;
+    stackCommand *root = NULL;
     char command;
     unsigned int position;
     char character ='\0';
@@ -155,7 +149,7 @@ void stringToFile(char *fileOutput, char *string) {
 }
 
 
-void writeModFile(Stack *stack, char *fileOutput) {
+void writeModFile(stackCommand *stack, char *fileOutput) {
         FILE *filebin;
         if ((filebin = fopen(fileOutput, "w+b")) == NULL) {
             perror("Could not open file");
@@ -182,7 +176,7 @@ void writeModFile(Stack *stack, char *fileOutput) {
 
 
 void applyModToFile(char *fileInput, char *fileModify, char *fileOutput) {
-    Stack *root = readModFile(fileModify);
+    stackCommand *root = readModFile(fileModify);
     char *stringInput = fileToString(fileInput);
     while (!checkEmptyCommandStack(root)) {
         type_op type = root->type;

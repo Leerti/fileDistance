@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void getDistance (char *firstFile, char *secondFile) {
     start_time();
     char *firstString = fileToString(firstFile);
@@ -49,9 +50,11 @@ void recursiveSearch(char *fInput, char *directory, unsigned int limit){
     printf("TIME: %lf\n", end_time());
 }
 
+
 void search(char *fInput, char *directory){
     recursiveSearch(fInput, directory, 0);
 }
+
 
 void searchAll(char *fInput, char *directory, int limit){
     recursiveSearch(fInput, directory, limit);

@@ -1,10 +1,10 @@
-CC = gcc
+
 objects = main.o distance.o levenshteindistance.o stackCommand.o priorityQueueFile.o iofile.o timer.o
 
-all : fileDistance
+all : filedistance
 
-fileDistance : $(objects)
-	$(CC) -o fileDistance $(objects)
+filedistance : $(objects)
+	gcc -o filedistance $(objects)
 
 main.o : main.c distance.h
 
@@ -21,4 +21,4 @@ priorityQueueFile.o : priorityQueueFile.h
 timer.o : timer.c
 
 clean : 
-	rm *.o fileDistance
+	rm *.o filedistance

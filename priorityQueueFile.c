@@ -2,37 +2,34 @@
 //  stackFile.c
 //  fileDistance
 //
-//  Created by Alessandra Lerteri Caroletta on 25/09/20.
+//  Created by Alessandra Lerteri Caroletta on 22/09/20.
 //
 
 #include "priorityQueueFile.h"
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+
 /*
-Function to create a new node to add to the stack.
+Questa funzione viene richiamata dalla funzione ENQUEUENODE per allocare la memoria necessaria a contenere un nuovo nodo della coda.
  */
-StackFile *newNodeFile(){
-    StackFile *queueNode =(StackFile*)malloc(sizeof(StackFile));
+queueFile *newNodeFile(){
+    queueFile *queueNode =(queueFile*)malloc(sizeof(queueFile));
     queueNode->distance = 0;
     queueNode->path = (char*) malloc(sizeof(char));
     queueNode->next = NULL;
     return queueNode;
 }
 
-int checkEmptyFileStack(StackFile *root){
-    if(root!=NULL){
-        return 0;
-    }
-  return 1;
-}
 
-void insertNode(StackFile **root, StackFile *newNode){
-    StackFile *head = *root;
-    if(checkEmptyFileStack(*root)){
+/*
+ Questa funzione viene richiamata da ENQUEUENODE per inserire il nodo nella giusta posizione.
+ */
+void insertNode(queueFile **root, queueFile *newNode){
+    queueFile *head = *root;
+    if(checkEmptyQueue(*root)){
         *root = newNode;
         return;
     }
@@ -47,8 +44,8 @@ void insertNode(StackFile **root, StackFile *newNode){
     }
 }
 
-void enqueueFile(StackFile **root, char *path, unsigned int distance){
-    StackFile *newNode = newNodeFile();
+void enqueueFile(queueFile **root, char *path, unsigned int distance){
+    queueFile *newNode = newNodeFile();
     newNode->distance = distance;
     newNode->path = realloc(newNode->path, strlen(path));
     newNode->path = path;
@@ -56,10 +53,18 @@ void enqueueFile(StackFile **root, char *path, unsigned int distance){
     
 }
 
-void dequeueFile(StackFile **root){
-    StackFile *tmp = *root;
-    if(!checkEmptyFileStack(*root)){
+void dequeueFile(queueFile **root){
+    queueFile *tmp = *root;
+    if(!checkEmptyQueue(*root)){
         *root = (*root)->next;
         free(tmp);
     }
 }
+
+int checkEmptyQueue(queueFile *root){
+    if(root!=NULL){
+        return 0;
+    }
+  return 1;
+}
+

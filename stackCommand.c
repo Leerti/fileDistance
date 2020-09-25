@@ -11,12 +11,12 @@
 #include <string.h>
 
 
-/**
- *Funzione utilizzata per creare un nuovo nodo.
- *Viene richiamata dalla funzione pushNode per allocare la memoria necessaria a contenere uno Stack.
+/*
+ Funzione utilizzata per creare un nuovo nodo.
+ Viene richiamata dalla funzione pushNode per allocare la memoria necessaria a contenere uno Stack.
  */
-Stack *createNewNode () {
-    Stack *newNode = (Stack *) calloc(1,sizeof(Stack));
+stackCommand *createNewNode () {
+    stackCommand *newNode = (stackCommand *) calloc(1,sizeof(stackCommand));
     newNode->pos = 0;
     newNode->character = ' ';
     newNode->type = 0;
@@ -25,8 +25,8 @@ Stack *createNewNode () {
 }
 
 
-void pushCommand (Stack **root, unsigned int pos, char character, type_op type) {
-    Stack *nextNode = createNewNode();
+void pushCommand (stackCommand **root, unsigned int pos, char character, type_op type) {
+    stackCommand *nextNode = createNewNode();
     nextNode->pos = pos;
     nextNode->character = character;
     nextNode->type = type;
@@ -35,8 +35,8 @@ void pushCommand (Stack **root, unsigned int pos, char character, type_op type) 
 }
 
 
-void popCommand (Stack **root) {
-    Stack * temp= *root;
+void popCommand (stackCommand **root) {
+    stackCommand * temp= *root;
     if(!checkEmptyCommandStack(*root)){
         *root = (*root)->prev;
       
@@ -48,7 +48,7 @@ void popCommand (Stack **root) {
 }
 
 
-char *getType (Stack *node) {
+char *getType (stackCommand *node) {
     if(!checkEmptyCommandStack(node)){
         switch (node->type) {
             case SET:
@@ -63,7 +63,7 @@ char *getType (Stack *node) {
 }
 
 
-int checkEmptyCommandStack (Stack *root) {
+int checkEmptyCommandStack (stackCommand *root) {
     if(root!=NULL){
         return 0;
     }

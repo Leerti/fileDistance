@@ -2,7 +2,7 @@
 //  distance.c
 //  FileDistance
 //
-//  Created by Alessandra Lerteri Caroletta on 23/09/20.
+//  Created by Alessandra Lerteri Caroletta on 21/09/20.
 //
 
 #include "distance.h"
@@ -38,8 +38,22 @@ void getCommand(char *firstFile, char *secondFile, char *fOutput){
 
 void applyMod(char *fInput, char *fModify, char *fOutput){
     start_time();
-    modifyFile(fInput,fModify,fOutput);
+    applyModToFile(fInput,fModify,fOutput);
     printf("TIME: %lf\n", end_time());
 
+}
+
+void recursiveSearch(char *fInput, char *directory, unsigned int limit){
+    start_time();
+    recursiveLevensthein(fInput, directory, limit);
+    printf("TIME: %lf\n", end_time());
+}
+
+void search(char *fInput, char *directory){
+    recursiveSearch(fInput, directory, 0);
+}
+
+void searchAll(char *fInput, char *directory, int limit){
+    recursiveSearch(fInput, directory, limit);
 }
 

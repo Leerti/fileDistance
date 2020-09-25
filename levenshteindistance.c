@@ -2,7 +2,7 @@
 //  levenshteindistance.c
 //  FileDistance
 //
-//  Created by Alessandra Lerteri Caroletta on 23/09/20.
+//  Created by Alessandra Lerteri Caroletta on 21/09/20.
 //
 
 #include "levenshteindistance.h"
@@ -10,9 +10,14 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include "stackCommand.h"
+#include "priorityQueueFile.h"
 
 
+/*
+ *Funzione che calcola il minimo tra tre numeri
+ */
 int min(int a, int b, int c) {
     int min = a;
     if (b < min) min = b;
@@ -21,6 +26,11 @@ int min(int a, int b, int c) {
 }
 
 
+/*
+ *Controlla se la lunghezza di una delle due stringhe è 0. in questo caso la distanza di edit è pari alla lunghezza dell'altra
+ * stringa.
+ *Se entrambe le stringhe hanno almeno un carattere, la funzione ritorna 0.
+ */
 int checkNull(int x, int y) {
     if (x == 0) {
         return y;
@@ -30,6 +40,14 @@ int checkNull(int x, int y) {
     return 0;
 }
 
+
+/*
+ *Funzione che calcola il valore di un elemento della matrice.
+ *L'elemento viene calcolato come il minimo tra l'emento nella riga precende e stessa colonna (aboveEl) +1, l'elemento nella
+ * colonna precente e stessa riga (leftEl) +1  e l'elemento nella riga precende e nella colonna precedente (diagonalEl) + cost.
+ *Cost è uguale a 0 se e solo se i caratterie della seconda e prima stringa corrispondenti rispettivamente alla riga(-1) e alla
+ * colonna(-1) dell'elemento da calcolare, sono uguali
+ */
 int calculateElement(int aboveEl, int leftEl, int diagonalEl, char firstStringChar, char secondStringChar) {
     int cost = 0;
     if (firstStringChar != secondStringChar) {
@@ -39,16 +57,23 @@ int calculateElement(int aboveEl, int leftEl, int diagonalEl, char firstStringCh
     return el;
 }
 
-int **initMatrix(int **matrix, char *firstString, int x, char *secondString, int y) {
+
+/*
+ *Funzione che presa in input una matrice m*n ne calcola gli elementi richiamando la funzione CALCULATEELEMENT
+ */
+void initMatrix(int **matrix, char *firstString, int x, char *secondString, int y) {
     for (int i = 1; i < x; i++) {
         for (int j = 1; j < y; j++) {
             matrix[i][j] = calculateElement(matrix[i - 1][j], matrix[i][j - 1], matrix[i - 1][j - 1], firstString[i-1], secondString[j-1]);
         }
     }
-    return matrix;
 }
 
 
+/*
+ *Funzione che prese in input due strighe di lunghezza m-1 ed n-1, alloca l'alrea necessaria a contenere la matrice m*n.
+ *Inizializza la matrice scrivendo nella prima righa 0...n e nella prima colonna 0...m
+ */
 int **createMatrix(char *firstString, char *secondString) {
     int x = (int) strlen(firstString) + 1;
     int y = (int) strlen(secondString) + 1;
@@ -63,9 +88,14 @@ int **createMatrix(char *firstString, char *secondString) {
     for (int j = 1; j < y; j++) {
         matrix[0][j] = j;
     }
-    return initMatrix(matrix, firstString, x, secondString, y);
+    initMatrix(matrix, firstString, x, secondString, y);
+    return matrix;
 }
 
+
+/*
+ *Funzione per deallocare la matrice passata in input
+ */
 void deallocateMatrix(int size, int **matrix) {
     for (int i = 0; i < size; i++) {
         free(matrix[i]);
@@ -73,6 +103,15 @@ void deallocateMatrix(int size, int **matrix) {
     free(matrix);
 }
 
+
+/*
+ *Funzione che prende in input una matrice gia riempita  e le coordinate x, y
+ *Per la casella con coordinate x,y calcola l'operazione da eseguire :ADD, DEL  o SET.
+ *Se la casella di cui determinare l'operazione fa parte della prima riga il valore di ritorno è ADD( significa che la seconda
+ *stringa è piu corta della prima e per trasformarla nella prima bisogna ggiungere caratteri)
+ *Se la casella di cui determinare l'operazione fa parte della pirma colonna il valore di ritonro è DEL( significa che la prima
+ *srtringa è piu corta della seconda e per trasfomrare la seocnda nella prima bisogna eliminare caratteri)
+ */
 type_op defineOperation(int**matrix, int x, int y) {
     if (x == 0) {
         return DEL;
@@ -89,22 +128,32 @@ type_op defineOperation(int**matrix, int x, int y) {
     }
 }
 
+
+/*
+ *Queata funzione prende in input un 'type' che rappresenta il tipo dell'operazione, uno Stack, le due stringhe e i puntatori
+ * alle  coordinate x,y.
+ *Aggiunge allo stack un nuovo nodo composto dall'operazione in input, nella posizione contenuta nella variabile puntatta da y,
+ * del carattere corrispondente alla poszione x-1 della prima stringa.
+ *Nel caso in cui l'operazione da eseguire sia una SET, si controlla se i caratteri delle due stringhe rispettivamente nelle
+ * posizione x-1 e y-1 sono diversi: solo in questo caso si esegue la SET, altrimenti non si esegue nulla.
+ */
 void pushOperation(type_op type, Stack **root, char *firstString, char *secondString, int *x, int *y) {
     if (type == SET) {
         if (firstString[*x - 1] != secondString[*y - 1]) {
-            pushNode(root, *y, firstString[*x - 1], SET);
+            pushCommand(root, *y, firstString[*x - 1], SET);
         }
         (*x)--;
         (*y)--;
     } else if (type == DEL) {
-        pushNode(root, *y, ' ', DEL);
+        pushCommand(root, *y, ' ', DEL);
         (*y)--;
     } else if (type == ADD) {
-        pushNode(root, *y, firstString[*x - 1], ADD);
+        pushCommand(root, *y, firstString[*x - 1], ADD);
         (*x)--;
     }
 
 }
+
 
 int calculateLevenshtein(char *firstString, char *secondString) {
     int x = (int)strlen(firstString);
@@ -119,9 +168,7 @@ int calculateLevenshtein(char *firstString, char *secondString) {
         for (i = 1; i <= x; i++) {
             curr[0] = i;
             for (j = 1; j <= y; j++) {
-                curr[j] = calculateElement(prev[j], curr[j - 1],
-                                           prev[j - 1], firstString[i - 1], secondString[j - 1]);
-
+                curr[j] = calculateElement(prev[j], curr[j - 1], prev[j - 1], firstString[i - 1], secondString[j - 1]);
             }
             for (int k = 0; k <= y; k++)
                 prev[k] = curr[k];
@@ -151,3 +198,53 @@ Stack *getOperations(char *firstString, char *secondString) {
 }
 
 
+/*
+Function that pays a deep visit to the directory: "pBase"
+and populates the "root" queue with the edit distance
+between the files in the directory and the "fInput" file.
+ */
+void depthSearch(char *fInput, char *pBase, StackFile **root){
+    struct dirent *dp;
+    DIR *directory = opendir(pBase);
+    
+    if(!directory)
+        return;
+    while((dp = readdir(directory)) != NULL){
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0 && strcmp(dp->d_name, ".DS_Store")){
+            char *path = (char*)malloc((strlen(pBase)+strlen(dp->d_name)+1)*sizeof(char));
+            strcpy(path, pBase);
+            strcat(path, "/");
+            strcat(path, dp->d_name);
+            if(dp->d_type != DT_DIR)
+                enqueueFile(root, path, calculateLevenshtein(fInput, path));
+            else
+                depthSearch(fInput, path, root);
+        }
+    }
+    closedir(directory);
+}
+
+/*
+function to print the queue of edit distances based
+on the unsigned int limit: "distanceLimit"
+ */
+
+void printQueuePath(StackFile **root, unsigned int distanceLimit){
+    if(checkEmptyFileStack(*root))
+        return;
+    StackFile *node = *root;
+    if(distanceLimit==0)
+        distanceLimit = (*root)->distance;
+    while (!checkEmptyFileStack(*root) && (node = *root)->distance <= distanceLimit) {
+        char *path = realpath(node->path, NULL);
+        printf("%i\t\t%s\n", node->distance, path);
+        dequeueFile(root);
+    }
+}
+
+void recursiveLevensthein(char *fInput, char *path, unsigned int distanceLimit){
+    StackFile *root = NULL;
+    depthSearch(fInput, path, &root);
+    printQueuePath(&root, distanceLimit);
+    
+}

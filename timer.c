@@ -2,7 +2,7 @@
 //  timer.c
 //  FileDistance
 //
-//  Created by Alessandra Lerteri Caroletta on 23/09/20.
+//  Created by Alessandra Lerteri Caroletta on 21/09/20.
 //
 
 #include "timer.h"
@@ -11,9 +11,11 @@
 
 time_t start, end;
 
+
 void start_time(void){
     start = clock();
 }
+
 
 double end_time(void){
     end= clock();
